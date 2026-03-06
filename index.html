@@ -65,6 +65,13 @@
   }
   .cursor-ring.hovered { width: 52px; height: 52px; border-color: var(--accent); opacity: 0.7; }
 
+  /* Hide cursor entirely on touch devices */
+  @media (hover: none), (pointer: coarse) {
+    .cursor-dot, .cursor-ring { display: none !important; }
+    body, body.cursor-active { cursor: auto !important; }
+    body.cursor-active a, body.cursor-active button, body.cursor-active .glass { cursor: auto !important; }
+  }
+
   /* SCROLL PROGRESS */
   .scroll-progress {
     position: fixed; top: 0; left: 0; height: 2px; width: 0%;
@@ -481,8 +488,8 @@
   .form-group input:focus, .form-group textarea:focus {
     border-color: var(--accent); background: rgba(79,255,176,0.04);
   }
-  .form-group input.input-valid { border-color: var(--accent) !important; background: rgba(79,255,176,0.04) !important; }
-  .form-group input.input-invalid { border-color: #ff4f6a !important; background: rgba(255,79,106,0.04) !important; }
+  .form-group input.input-valid, input.input-valid { border-color: var(--accent) !important; background: rgba(79,255,176,0.04) !important; }
+  .form-group input.input-invalid, input.input-invalid { border-color: #ff4f6a !important; background: rgba(255,79,106,0.04) !important; }
   .field-hint {
     font-family: 'DM Mono', monospace; font-size: 0.68rem;
     margin-top: 4px; min-height: 16px;
@@ -542,21 +549,87 @@
     height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent);
   }
 
-  /* RESPONSIVE */
+  /* HAMBURGER */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column; justify-content: center; gap: 5px;
+    width: 40px; height: 40px;
+    background: none; border: none; padding: 6px; cursor: pointer;
+  }
+  .nav-hamburger span {
+    display: block; height: 2px; width: 100%;
+    background: var(--text); border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* MOBILE DRAWER */
+  .nav-mobile {
+    display: none;
+    position: fixed; top: 61px; left: 0; right: 0; bottom: 0;
+    background: rgba(8,11,15,0.98);
+    backdrop-filter: blur(24px);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px 40px;
+    z-index: 98;
+    flex-direction: column; gap: 0;
+    overflow-y: auto;
+  }
+  .nav-mobile.open { display: flex; }
+  .nav-mobile a {
+    font-family: 'DM Mono', monospace; font-size: 1rem; font-weight: 400;
+    color: var(--muted); text-decoration: none;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 18px 0; border-bottom: 1px solid var(--border);
+    transition: color 0.2s;
+  }
+  .nav-mobile a:last-child { border-bottom: none; }
+  .nav-mobile a:active { color: var(--accent); }
+
+  /* DIVIDER */
+  .section-divider {
+    max-width: 1200px; margin: 0 auto;
+    height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+
+  /* RESPONSIVE — tablet */
   @media (max-width: 900px) {
-    nav { padding: 16px 24px; }
-    .nav-links { display: none; }
-    #hero { padding: 100px 24px 60px; }
-    .section-wrap { padding: 72px 24px; }
+    nav { padding: 16px 20px; }
+    .nav-links, .nav-cta { display: none; }
+    .nav-hamburger { display: flex; }
+    #hero { padding: 100px 20px 60px; }
+    .section-wrap { padding: 64px 20px; }
     #about .about-grid { grid-template-columns: 1fr; }
     #contact .contact-wrap { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
-    footer { flex-direction: column; gap: 16px; padding: 28px 24px; }
+    footer { flex-direction: column; gap: 16px; padding: 28px 20px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+    .hero-stats { gap: 24px; padding-top: 32px; margin-top: 40px; }
+    .timeline { padding-left: 20px; }
+    .timeline-item::before { left: -24px; }
+    .tl-header { flex-direction: column; gap: 8px; }
+    .cert-row { flex-direction: column; }
+    .terminal-body { padding: 20px; }
+    .terminal-body pre { font-size: 0.8rem; }
   }
+
+  /* RESPONSIVE — mobile */
   @media (max-width: 600px) {
-    .hero-stats { gap: 28px; }
+    .hero-name { font-size: clamp(2.8rem, 13vw, 5rem); }
+    .hero-stats { gap: 16px; }
+    .hero-stats > div { min-width: calc(50% - 8px); }
+    .hero-actions { flex-direction: column; }
+    .hero-actions a { text-align: center; justify-content: center; }
     #projects .projects-grid { grid-template-columns: 1fr; }
     #skills .skills-grid { grid-template-columns: 1fr; }
+    .about-main { padding: 20px; }
+    .contact-form { padding: 20px; }
+    .section-title { font-size: clamp(1.7rem, 7vw, 2.5rem); }
+    .blog-coming { padding: 40px 20px; }
+    .form-submit { width: 100%; }
+    .stat-num { font-size: 1.8rem; }
   }
 </style>
 </head>
@@ -588,7 +661,21 @@
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Get in Touch</a>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- MOBILE NAV DRAWER -->
+<div class="nav-mobile" id="navMobile">
+  <a href="#about"      onclick="closeMobileNav()">About</a>
+  <a href="#experience" onclick="closeMobileNav()">Experience</a>
+  <a href="#terminal"   onclick="closeMobileNav()">Terminal</a>
+  <a href="#projects"   onclick="closeMobileNav()">Projects</a>
+  <a href="#skills"     onclick="closeMobileNav()">Skills</a>
+  <a href="#blog"       onclick="closeMobileNav()">Blog</a>
+  <a href="#contact"    onclick="closeMobileNav()">Contact</a>
+</div>
 
 <!-- HERO -->
 <section id="hero">
@@ -896,14 +983,17 @@
       <div class="blog-coming-emoji">✍️</div>
       <h3>Something's brewing.</h3>
       <p>I'm starting to write about infrastructure, ops learnings, tools I build, and things I learn the hard way. First post coming soon.</p>
-      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;justify-content:center;">
-        <input type="email" id="notifyEmail" placeholder="your@email.com"
-          style="background:rgba(255,255,255,0.05);border:1px solid var(--border-bright);color:var(--text);
-          font-family:'DM Mono',monospace;font-size:0.82rem;padding:10px 16px;border-radius:8px;
-          outline:none;width:240px;" />
-        <button onclick="handleNotify(event)" class="btn-ghost" style="font-size:0.82rem;padding:10px 20px;">
-          Notify me →
-        </button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:16px;width:100%;max-width:360px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;">
+          <input type="email" id="notifyEmail" placeholder="your@email.com"
+            style="background:rgba(255,255,255,0.04);border:1px solid var(--border-bright);color:var(--text);
+            font-family:'DM Mono',monospace;font-size:0.82rem;padding:10px 16px;border-radius:8px;
+            outline:none;width:220px;transition:border-color 0.2s,background 0.2s;" />
+          <button onclick="handleNotify(event)" id="notifyBtn" class="btn-ghost" style="font-size:0.82rem;padding:10px 20px;">
+            Notify me →
+          </button>
+        </div>
+        <span class="field-hint" id="notifyEmailHint" style="text-align:center;"></span>
       </div>
       <div id="notifySuccess" style="display:none;font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--accent);margin-top:10px;">
         ✅ You're on the list!
@@ -993,11 +1083,12 @@ document.addEventListener('DOMContentLoaded', function() {
   var expEl = document.getElementById('expMonths');
   if (expEl) expEl.innerHTML = months + '<span style="font-size:1.4rem">mo</span>';
 
-  // CURSOR
+  // CURSOR — disabled on touch devices
+  var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   var dot = document.getElementById('sg-cursor-dot');
   var ring = document.getElementById('sg-cursor-ring');
   var mx = 0, my = 0, rx = 0, ry = 0, started = false;
-  if (dot && ring) {
+  if (!isTouch && dot && ring) {
     dot.style.opacity = '0';
     ring.style.opacity = '0';
     document.addEventListener('mousemove', function(e) {
@@ -1061,36 +1152,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // LIVE EMAIL VALIDATION
-  var emailInput = document.getElementById('femail');
-  var emailHint = document.getElementById('emailHint');
+  // LIVE EMAIL VALIDATION — shared helper
   function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
-  if (emailInput && emailHint) {
-    emailInput.addEventListener('input', function() {
-      var v = emailInput.value.trim();
+  function applyEmailValidation(input, hint) {
+    if (!input || !hint) return;
+    input.addEventListener('input', function() {
+      var v = input.value.trim();
       if (!v) {
-        emailInput.className = emailInput.className.replace(/input-valid|input-invalid/g, '').trim();
-        emailHint.textContent = ''; emailHint.className = 'field-hint'; return;
+        input.classList.remove('input-valid', 'input-invalid');
+        hint.textContent = ''; hint.className = 'field-hint'; return;
       }
       if (isValidEmail(v)) {
-        emailInput.classList.remove('input-invalid'); emailInput.classList.add('input-valid');
-        emailHint.textContent = '✓ Looks good'; emailHint.className = 'field-hint valid';
+        input.classList.remove('input-invalid'); input.classList.add('input-valid');
+        hint.textContent = '✓ Looks good'; hint.className = 'field-hint valid';
       } else {
-        emailInput.classList.remove('input-valid'); emailInput.classList.add('input-invalid');
-        emailHint.className = 'field-hint invalid';
-        if (!v.includes('@')) emailHint.textContent = '✗ Missing @';
-        else if (!v.includes('.', v.indexOf('@') + 1)) emailHint.textContent = '✗ Missing domain (e.g. gmail.com)';
-        else emailHint.textContent = '✗ Invalid email format';
+        input.classList.remove('input-valid'); input.classList.add('input-invalid');
+        hint.className = 'field-hint invalid';
+        if (!v.includes('@')) hint.textContent = '✗ Missing @';
+        else if (!v.includes('.', v.indexOf('@') + 1)) hint.textContent = '✗ Missing domain (e.g. gmail.com)';
+        else hint.textContent = '✗ Invalid email format';
       }
     });
-    emailInput.addEventListener('blur', function() {
-      var v = emailInput.value.trim();
+    input.addEventListener('blur', function() {
+      var v = input.value.trim();
       if (v && !isValidEmail(v)) {
-        emailHint.textContent = '✗ Please enter a valid email address';
-        emailHint.className = 'field-hint invalid';
+        hint.textContent = '✗ Please enter a valid email address';
+        hint.className = 'field-hint invalid';
       }
     });
   }
+  applyEmailValidation(document.getElementById('femail'), document.getElementById('emailHint'));
+  applyEmailValidation(document.getElementById('notifyEmail'), document.getElementById('notifyEmailHint'));
 
   // TERMINAL
   var lines = [
@@ -1142,6 +1234,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+// HAMBURGER MENU
+function closeMobileNav() {
+  var h = document.getElementById('navHamburger');
+  var m = document.getElementById('navMobile');
+  if (h) h.classList.remove('open');
+  if (m) m.classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var h = document.getElementById('navHamburger');
+  var m = document.getElementById('navMobile');
+  if (h && m) {
+    h.addEventListener('click', function() {
+      h.classList.toggle('open');
+      m.classList.toggle('open');
+    });
+  }
+});
+
 // CONTACT FORM
 function handleSubmit(e) {
   e.preventDefault();
@@ -1180,21 +1290,42 @@ function handleSubmit(e) {
 // BLOG NOTIFY
 function handleNotify(e) {
   e.preventDefault();
-  var email   = document.getElementById('notifyEmail').value.trim();
+  var emailInput = document.getElementById('notifyEmail');
+  var hint    = document.getElementById('notifyEmailHint');
   var success = document.getElementById('notifySuccess');
   var error   = document.getElementById('notifyError');
+  var btn     = document.getElementById('notifyBtn');
+  var email   = emailInput.value.trim();
+
   if (!email) { alert('Please enter your email.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    if (hint) { hint.textContent = '✗ Please enter a valid email address'; hint.className = 'field-hint invalid'; }
+    emailInput.classList.add('input-invalid');
+    emailInput.focus();
+    return;
+  }
+
+  btn.textContent = 'Sending...'; btn.disabled = true;
   fetch('https://formspree.io/f/' + FORMSPREE_ID, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ email: email, subject: 'Blog notification request', message: 'Please add me to blog notifications.' })
+    body: JSON.stringify({
+      email: email,
+      _replyto: email,
+      subject: 'Blog Notification Request',
+      message: 'Please add ' + email + ' to blog post notifications.'
+    })
   }).then(function(r) {
     if (r.ok) {
       success.style.display = 'block'; error.style.display = 'none';
-      document.getElementById('notifyEmail').value = '';
+      emailInput.value = '';
+      if (hint) { hint.textContent = ''; hint.className = 'field-hint'; }
+      emailInput.classList.remove('input-valid', 'input-invalid');
+      btn.textContent = '✓ Done!';
     } else { throw new Error(); }
   }).catch(function() {
     error.style.display = 'block'; success.style.display = 'none';
+    btn.textContent = 'Notify me \u2192'; btn.disabled = false;
   });
 }
 </script>
