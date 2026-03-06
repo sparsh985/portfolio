@@ -481,6 +481,15 @@
   .form-group input:focus, .form-group textarea:focus {
     border-color: var(--accent); background: rgba(79,255,176,0.04);
   }
+  .form-group input.input-valid { border-color: var(--accent) !important; background: rgba(79,255,176,0.04) !important; }
+  .form-group input.input-invalid { border-color: #ff4f6a !important; background: rgba(255,79,106,0.04) !important; }
+  .field-hint {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    margin-top: 4px; min-height: 16px;
+    transition: color 0.2s;
+  }
+  .field-hint.valid { color: var(--accent); }
+  .field-hint.invalid { color: #ff4f6a; }
   .form-group textarea { min-height: 120px; }
   .form-submit {
     padding: 14px 32px; background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -950,6 +959,7 @@
           <div class="form-group">
             <label>Email</label>
             <input type="email" id="femail" name="email" placeholder="you@email.com" />
+            <span class="field-hint" id="emailHint"></span>
           </div>
         </div>
         <div class="form-group">
@@ -970,28 +980,18 @@
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <div class="footer-copy">© 2025 Sparsh Gupta. Built with care, no frameworks needed.</div>
-  <div class="footer-links">
-    <a href="https://linkedin.com/in/ssparsh" target="_blank">LinkedIn</a>
-    <a href="https://github.com/sparsh985" target="_blank">GitHub</a>
-    <a href="mailto:me@sparsh.work">me@sparsh.work</a>
-    <a href="#hero">↑ Top</a>
-  </div>
-</footer>
-
 
 <script>
 var FORMSPREE_ID = 'mqeykbno';
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 
   // DYNAMIC MONTHS
   var start = new Date(2023, 6, 1);
   var now = new Date();
   var months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-  var el = document.getElementById('expMonths');
-  if (el) el.innerHTML = months + '<span style="font-size:1.4rem">mo</span>';
+  var expEl = document.getElementById('expMonths');
+  if (expEl) expEl.innerHTML = months + '<span style="font-size:1.4rem">mo</span>';
 
   // CURSOR
   var dot = document.getElementById('sg-cursor-dot');
@@ -1007,8 +1007,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!started) {
         started = true;
         document.body.classList.add('cursor-active');
-        dot.style.opacity = '1';
-        ring.style.opacity = '1';
+        dot.style.opacity = '1'; ring.style.opacity = '1';
         rx = mx; ry = my;
       }
     });
@@ -1036,19 +1035,19 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // SCROLL PROGRESS
-  var progress = document.getElementById('scrollProgress');
+  var prog = document.getElementById('scrollProgress');
   window.addEventListener('scroll', function() {
     var h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    if (progress) progress.style.width = (document.documentElement.scrollTop / h) * 100 + '%';
+    if (prog) prog.style.width = (document.documentElement.scrollTop / h) * 100 + '%';
   });
 
   // FADE IN
-  var observer = new IntersectionObserver(function(entries) {
+  var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.08 });
   document.querySelectorAll('.fade-in').forEach(function(el) {
     el.classList.add('animate-ready');
-    observer.observe(el);
+    obs.observe(el);
   });
 
   // ACTIVE NAV
@@ -1058,9 +1057,40 @@ document.addEventListener('DOMContentLoaded', function () {
     var current = '';
     sections.forEach(function(s) { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
     navLinks.forEach(function(a) {
-      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+      a.style.color = (a.getAttribute('href') === '#' + current) ? 'var(--accent)' : '';
     });
   });
+
+  // LIVE EMAIL VALIDATION
+  var emailInput = document.getElementById('femail');
+  var emailHint = document.getElementById('emailHint');
+  function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+  if (emailInput && emailHint) {
+    emailInput.addEventListener('input', function() {
+      var v = emailInput.value.trim();
+      if (!v) {
+        emailInput.className = emailInput.className.replace(/input-valid|input-invalid/g, '').trim();
+        emailHint.textContent = ''; emailHint.className = 'field-hint'; return;
+      }
+      if (isValidEmail(v)) {
+        emailInput.classList.remove('input-invalid'); emailInput.classList.add('input-valid');
+        emailHint.textContent = '✓ Looks good'; emailHint.className = 'field-hint valid';
+      } else {
+        emailInput.classList.remove('input-valid'); emailInput.classList.add('input-invalid');
+        emailHint.className = 'field-hint invalid';
+        if (!v.includes('@')) emailHint.textContent = '✗ Missing @';
+        else if (!v.includes('.', v.indexOf('@') + 1)) emailHint.textContent = '✗ Missing domain (e.g. gmail.com)';
+        else emailHint.textContent = '✗ Invalid email format';
+      }
+    });
+    emailInput.addEventListener('blur', function() {
+      var v = emailInput.value.trim();
+      if (v && !isValidEmail(v)) {
+        emailHint.textContent = '✗ Please enter a valid email address';
+        emailHint.className = 'field-hint invalid';
+      }
+    });
+  }
 
   // TERMINAL
   var lines = [
@@ -1104,11 +1134,12 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(typeNext, line.text === '' ? 80 : 280);
       }
     }
-    var tObs = new IntersectionObserver(function(e) {
-      if (e[0].isIntersecting) { typeNext(); tObs.disconnect(); }
+    var tObs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) { typeNext(); tObs.disconnect(); }
     }, { threshold: 0.3 });
     tObs.observe(termEl);
   }
+
 });
 
 // CONTACT FORM
@@ -1122,6 +1153,13 @@ function handleSubmit(e) {
   var success = document.getElementById('formSuccess');
   var error   = document.getElementById('formError');
   if (!name || !email || !message) { alert('Please fill in name, email and message.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    var hint = document.getElementById('emailHint');
+    if (hint) { hint.textContent = '✗ Please enter a valid email address'; hint.className = 'field-hint invalid'; }
+    document.getElementById('femail').classList.add('input-invalid');
+    document.getElementById('femail').focus();
+    return;
+  }
   btn.textContent = 'Sending...'; btn.disabled = true;
   fetch('https://formspree.io/f/' + FORMSPREE_ID, {
     method: 'POST',
@@ -1135,7 +1173,7 @@ function handleSubmit(e) {
     } else { throw new Error(); }
   }).catch(function() {
     error.style.display = 'block'; success.style.display = 'none';
-    btn.textContent = 'Send Message →'; btn.disabled = false;
+    btn.textContent = 'Send Message \u2192'; btn.disabled = false;
   });
 }
 
