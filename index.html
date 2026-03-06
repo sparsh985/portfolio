@@ -661,7 +661,7 @@
         </div>
         <div class="glass about-card fade-in fade-in-delay-2">
           <div class="about-card-label">📬 Email</div>
-          <div class="about-card-value"><a href="mailto:me@sparsh.work" style="color:var(--accent);text-decoration:none;">me@sparsh.work</a></div>
+          <div class="about-card-value"><a href="/cdn-cgi/l/email-protection#432e260330332231302b6d342c3128" style="color:var(--accent);text-decoration:none;"><span class="__cf_email__" data-cfemail="68050d281b18091a1b00461f071a03">[email&#160;protected]</span></a></div>
         </div>
       </div>
     </div>
@@ -925,11 +925,11 @@
             <div class="contact-link-sub">linkedin.com/in/ssparsh</div>
           </div>
         </a>
-        <a href="mailto:me@sparsh.work" class="glass contact-link">
+        <a href="/cdn-cgi/l/email-protection#a7cac2e7d4d7c6d5d4cf89d0c8d5cc" class="glass contact-link">
           <span class="contact-link-icon">📬</span>
           <div>
             <div class="contact-link-text">Email</div>
-            <div class="contact-link-sub">me@sparsh.work</div>
+            <div class="contact-link-sub"><span class="__cf_email__" data-cfemail="b9d4dcf9cac9d8cbcad197ced6cbd2">[email&#160;protected]</span></div>
           </div>
         </a>
         <a href="https://github.com/sparsh985" target="_blank" rel="noopener" class="glass contact-link">
@@ -961,7 +961,7 @@
           <textarea id="fmessage" name="message" placeholder="Tell me more..."></textarea>
         </div>
         <button class="form-submit" id="formSubmitBtn" onclick="handleSubmit(event)">Send Message →</button>
-        <p class="form-note">Sends directly to me@sparsh.work</p>
+        <p class="form-note">Sends directly to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7b161e3b080b1a090813550c140910">[email&#160;protected]</a></p>
         <div class="form-success" id="formSuccess">✅ Message sent! I'll get back to you soon.</div>
         <div class="form-error" id="formError">❌ Something went wrong. Please try again.</div>
       </div>
@@ -980,32 +980,27 @@
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ── FORMSPREE ENDPOINT ──────────────────────────────────
-// 1. Go to https://formspree.io and create a free account
-// 2. Create a new form, set email to me@sparsh.work
-// 3. Replace YOUR_FORM_ID below with your actual form ID (e.g. xpwzgkla)
-var FORMSPREE_ID = 'YOUR_FORM_ID';
+
+<script>
+var FORMSPREE_ID = 'mqeykbno';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // ── DYNAMIC EXPERIENCE MONTHS ──────────────────────────
-  var startDate = new Date(2023, 6, 1); // July 2023 (month is 0-indexed)
+  // DYNAMIC MONTHS
+  var start = new Date(2023, 6, 1);
   var now = new Date();
-  var months = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth());
+  var months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
   var el = document.getElementById('expMonths');
   if (el) el.innerHTML = months + '<span style="font-size:1.4rem">mo</span>';
 
-  // ── CURSOR ──────────────────────────────────────────────
+  // CURSOR
   var dot = document.getElementById('sg-cursor-dot');
   var ring = document.getElementById('sg-cursor-ring');
   var mx = 0, my = 0, rx = 0, ry = 0, started = false;
-
   if (dot && ring) {
     dot.style.opacity = '0';
     ring.style.opacity = '0';
-
-    document.addEventListener('mousemove', function (e) {
+    document.addEventListener('mousemove', function(e) {
       mx = e.clientX; my = e.clientY;
       document.documentElement.style.setProperty('--mouse-x', mx + 'px');
       document.documentElement.style.setProperty('--mouse-y', my + 'px');
@@ -1017,112 +1012,106 @@ document.addEventListener('DOMContentLoaded', function () {
         rx = mx; ry = my;
       }
     });
-
     (function loop() {
-      dot.style.left = mx + 'px';
-      dot.style.top = my + 'px';
-      rx += (mx - rx) * 0.18;
-      ry += (my - ry) * 0.18;
-      ring.style.left = rx + 'px';
-      ring.style.top = ry + 'px';
+      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+      rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
       requestAnimationFrame(loop);
     })();
-
-    document.querySelectorAll('a, button, .glass').forEach(function (el) {
-      el.addEventListener('mouseenter', function () { ring.classList.add('hovered'); });
-      el.addEventListener('mouseleave', function () { ring.classList.remove('hovered'); });
+    document.querySelectorAll('a, button, .glass').forEach(function(el) {
+      el.addEventListener('mouseenter', function() { ring.classList.add('hovered'); });
+      el.addEventListener('mouseleave', function() { ring.classList.remove('hovered'); });
     });
   }
 
-  // ── MAGNETIC BUTTONS ────────────────────────────────────
-  document.querySelectorAll('.magnetic').forEach(function (el) {
-    el.addEventListener('mousemove', function (e) {
+  // MAGNETIC BUTTONS
+  document.querySelectorAll('.magnetic').forEach(function(el) {
+    el.addEventListener('mousemove', function(e) {
       var rect = el.getBoundingClientRect();
       var moveX = (e.clientX - rect.left - rect.width / 2) * 0.25;
       var moveY = (e.clientY - rect.top - rect.height / 2) * 0.25;
       el.style.transform = 'translate(' + moveX + 'px,' + moveY + 'px)';
     });
-    el.addEventListener('mouseleave', function () { el.style.transform = 'translate(0,0)'; });
+    el.addEventListener('mouseleave', function() { el.style.transform = 'translate(0,0)'; });
   });
 
-  // ── SCROLL PROGRESS ─────────────────────────────────────
+  // SCROLL PROGRESS
   var progress = document.getElementById('scrollProgress');
-  window.addEventListener('scroll', function () {
+  window.addEventListener('scroll', function() {
     var h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     if (progress) progress.style.width = (document.documentElement.scrollTop / h) * 100 + '%';
   });
 
-  // ── FADE IN ──────────────────────────────────────────────
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+  // FADE IN
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.08 });
-  document.querySelectorAll('.fade-in').forEach(function (el) {
+  document.querySelectorAll('.fade-in').forEach(function(el) {
     el.classList.add('animate-ready');
     observer.observe(el);
   });
 
-  // ── ACTIVE NAV ───────────────────────────────────────────
+  // ACTIVE NAV
   var sections = document.querySelectorAll('section[id]');
   var navLinks = document.querySelectorAll('.nav-links a');
-  window.addEventListener('scroll', function () {
+  window.addEventListener('scroll', function() {
     var current = '';
-    sections.forEach(function (s) { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
-    navLinks.forEach(function (a) {
+    sections.forEach(function(s) { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+    navLinks.forEach(function(a) {
       a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
     });
   });
 
-  // ── TERMINAL TYPEWRITER ──────────────────────────────────
+  // TERMINAL
   var lines = [
-    { text: '$ whoami',                                          type: 'cmd' },
-    { text: 'sparsh_gupta',                                      type: 'out' },
-    { text: '',                                                  type: 'out' },
-    { text: '$ cat role.txt',                                    type: 'cmd' },
-    { text: 'SysAdmin @ D.E. Shaw & Co.',                        type: 'out' },
-    { text: '',                                                  type: 'out' },
-    { text: '$ skills --top',                                    type: 'cmd' },
-    { text: 'windows  linux  networking  automation  fleet-mgmt',type: 'out' },
-    { text: '',                                                  type: 'out' },
-    { text: '$ tickets_resolved',                                type: 'cmd' },
-    { text: '2,500+  (and counting)',                            type: 'out' },
-    { text: '',                                                  type: 'out' },
-    { text: '$ echo $PHILOSOPHY',                                type: 'cmd' },
-    { text: 'automate everything you hate doing twice',          type: 'out' },
-    { text: '',                                                  type: 'out' },
-    { text: '$ _',                                               type: 'cmd' },
+    { text: '$ whoami', type: 'cmd' },
+    { text: 'sparsh_gupta', type: 'out' },
+    { text: '', type: 'out' },
+    { text: '$ cat role.txt', type: 'cmd' },
+    { text: 'SysAdmin @ D.E. Shaw & Co.', type: 'out' },
+    { text: '', type: 'out' },
+    { text: '$ skills --top', type: 'cmd' },
+    { text: 'windows  linux  networking  automation  fleet-mgmt', type: 'out' },
+    { text: '', type: 'out' },
+    { text: '$ tickets_resolved', type: 'cmd' },
+    { text: '2,500+  (and counting)', type: 'out' },
+    { text: '', type: 'out' },
+    { text: '$ echo $PHILOSOPHY', type: 'cmd' },
+    { text: 'automate everything you hate doing twice', type: 'out' },
+    { text: '', type: 'out' },
+    { text: '$ _', type: 'cmd' }
   ];
   var termEl = document.getElementById('terminalOutput');
   if (termEl) {
-    var lineIndex = 0, charIndex = 0;
+    var li = 0, ci = 0;
     var cur = document.createElement('span');
     cur.className = 'terminal-cursor';
     function typeNext() {
-      if (lineIndex >= lines.length) { termEl.appendChild(cur); return; }
-      var line = lines[lineIndex];
-      if (charIndex === 0) {
-        var span = document.createElement('span');
-        span.className = line.type; span.id = 'tl-' + lineIndex;
-        termEl.appendChild(span);
+      if (li >= lines.length) { termEl.appendChild(cur); return; }
+      var line = lines[li];
+      if (ci === 0) {
+        var sp = document.createElement('span');
+        sp.className = line.type; sp.id = 'tl-' + li;
+        termEl.appendChild(sp);
       }
-      var span = document.getElementById('tl-' + lineIndex);
-      if (charIndex < line.text.length) {
-        span.textContent += line.text.charAt(charIndex++);
+      var sp = document.getElementById('tl-' + li);
+      if (ci < line.text.length) {
+        sp.textContent += line.text.charAt(ci++);
         setTimeout(typeNext, line.type === 'cmd' ? 40 : 22);
       } else {
         termEl.appendChild(document.createTextNode('\n'));
-        charIndex = 0; lineIndex++;
+        ci = 0; li++;
         setTimeout(typeNext, line.text === '' ? 80 : 280);
       }
     }
-    var tObs = new IntersectionObserver(function (e) {
+    var tObs = new IntersectionObserver(function(e) {
       if (e[0].isIntersecting) { typeNext(); tObs.disconnect(); }
     }, { threshold: 0.3 });
     tObs.observe(termEl);
   }
-
 });
 
-// ── CONTACT FORM (Formspree) ────────────────────────────
+// CONTACT FORM
 function handleSubmit(e) {
   e.preventDefault();
   var name    = document.getElementById('fname').value.trim();
@@ -1132,67 +1121,42 @@ function handleSubmit(e) {
   var btn     = document.getElementById('formSubmitBtn');
   var success = document.getElementById('formSuccess');
   var error   = document.getElementById('formError');
-
   if (!name || !email || !message) { alert('Please fill in name, email and message.'); return; }
-
-  if (!FORMSPREE_ID || FORMSPREE_ID === 'YOUR_FORM_ID') {
-    // Fallback to mailto if Formspree not configured yet
-    window.location.href = 'mailto:me@sparsh.work?subject=' + encodeURIComponent(subject || 'Portfolio Contact') + '&body=' + encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message);
-    return;
-  }
-
-  btn.textContent = 'Sending…'; btn.disabled = true;
+  btn.textContent = 'Sending...'; btn.disabled = true;
   fetch('https://formspree.io/f/' + FORMSPREE_ID, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ name: name, email: email, subject: subject, message: message })
-  }).then(function (r) {
+    body: JSON.stringify({ name: name, email: email, subject: subject || 'Portfolio Contact', message: message })
+  }).then(function(r) {
     if (r.ok) {
-      success.style.display = 'block';
-      error.style.display = 'none';
-      btn.textContent = '✓ Sent!';
-      document.getElementById('fname').value = '';
-      document.getElementById('femail').value = '';
-      document.getElementById('fsubject').value = '';
-      document.getElementById('fmessage').value = '';
-    } else {
-      throw new Error('Failed');
-    }
-  }).catch(function () {
-    error.style.display = 'block';
-    success.style.display = 'none';
-    btn.textContent = 'Send Message →';
-    btn.disabled = false;
+      success.style.display = 'block'; error.style.display = 'none';
+      btn.textContent = 'Sent!';
+      ['fname','femail','fsubject','fmessage'].forEach(function(id) { document.getElementById(id).value = ''; });
+    } else { throw new Error(); }
+  }).catch(function() {
+    error.style.display = 'block'; success.style.display = 'none';
+    btn.textContent = 'Send Message →'; btn.disabled = false;
   });
 }
 
-// ── BLOG NOTIFY (Formspree) ─────────────────────────────
+// BLOG NOTIFY
 function handleNotify(e) {
   e.preventDefault();
   var email   = document.getElementById('notifyEmail').value.trim();
   var success = document.getElementById('notifySuccess');
   var error   = document.getElementById('notifyError');
-
   if (!email) { alert('Please enter your email.'); return; }
-
-  if (!FORMSPREE_ID || FORMSPREE_ID === 'YOUR_FORM_ID') {
-    window.location.href = 'mailto:me@sparsh.work?subject=Blog%20Notification%20Request&body=Please%20notify%20me%20when%20you%20post%3A%20' + encodeURIComponent(email);
-    return;
-  }
-
   fetch('https://formspree.io/f/' + FORMSPREE_ID, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({ email: email, subject: 'Blog notification request', message: 'Please add me to blog notifications.' })
-  }).then(function (r) {
+  }).then(function(r) {
     if (r.ok) {
-      success.style.display = 'block';
-      error.style.display = 'none';
+      success.style.display = 'block'; error.style.display = 'none';
       document.getElementById('notifyEmail').value = '';
     } else { throw new Error(); }
-  }).catch(function () {
-    error.style.display = 'block';
-    success.style.display = 'none';
+  }).catch(function() {
+    error.style.display = 'block'; success.style.display = 'none';
   });
 }
 </script>
