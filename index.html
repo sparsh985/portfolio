@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sparsh Gupta — SysAdmin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #080b0f;
+    --surface: rgba(255,255,255,0.03);
+    --surface-hover: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.14);
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --accent: #4fffb0;
+    --accent2: #00c8ff;
+    --accent-dim: rgba(79,255,176,0.12);
+    --accent2-dim: rgba(0,200,255,0.10);
+    --red: #ff4f6a;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+  body.cursor-active { cursor: none; }
+  body.cursor-active a, body.cursor-active button, body.cursor-active .glass { cursor: none; }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+    mix-blend-mode: difference;
+  }
+  .cursor-dot {
+    width: 8px; height: 8px; background: #fff; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0;
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 9998;
+    transition: transform 0.18s ease, width 0.2s, height 0.2s, opacity 0.2s;
+  }
+  .cursor-ring.hovered { width: 56px; height: 56px; opacity: 0.6; }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+
+  /* GRID BG */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* GLOW ORBS */
+  .orb {
+    position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
+  }
+  .orb-1 { width: 600px; height: 600px; background: rgba(79,255,176,0.06); top: -200px; right: -100px; }
+  .orb-2 { width: 500px; height: 500px; background: rgba(0,200,255,0.05); bottom: 0; left: -150px; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(8,11,15,0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+    background: var(--accent); transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.05em;
+    padding: 8px 20px; border: 1px solid var(--border-bright);
+    background: var(--surface); color: var(--text); border-radius: 8px;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .nav-cta:hover { background: var(--surface-hover); border-color: var(--accent); color: var(--accent); }
+
+  /* SECTIONS */
+  section { position: relative; z-index: 2; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 48px 80px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .hero-tag span {
+    display: inline-block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+  .hero-name {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    line-height: 0.95; letter-spacing: -0.04em;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .hero-name .accent-word {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-title {
+    font-family: 'Instrument Serif', serif; font-style: italic;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    color: var(--muted); margin-bottom: 28px; font-weight: 400;
+  }
+  .hero-tagline {
+    font-family: 'DM Mono', monospace; font-size: 0.95rem;
+    color: rgba(232,234,240,0.6); line-height: 1.7;
+    max-width: 540px; margin-bottom: 48px;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; background: var(--accent); color: #080b0f;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+    border-radius: var(--radius-sm); text-decoration: none; border: none; cursor: none;
+    transition: all 0.25s; letter-spacing: 0.01em;
+  }
+  .btn-primary:hover { background: #6bffbf; transform: translateY(-2px); box-shadow: 0 12px 40px rgba(79,255,176,0.25); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; background: transparent; color: var(--text);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem;
+    border-radius: var(--radius-sm); text-decoration: none;
+    border: 1px solid var(--border-bright);
+    transition: all 0.25s; cursor: none;
+  }
+  .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex; gap: 48px; margin-top: 64px; padding-top: 48px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.2rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px;
+  }
+
+  /* GLASS CARD */
+  .glass {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px) saturate(140%);
+    border-radius: var(--radius);
+    transition: border-color 0.3s, background 0.3s, transform 0.3s;
+  }
+  .glass:hover { border-color: var(--border-bright); background: rgba(255,255,255,0.055); }
+
+  /* SECTION LAYOUT */
+  .section-wrap {
+    max-width: 1200px; margin: 0 auto;
+    padding: 100px 48px;
+  }
+  .section-header { margin-bottom: 56px; }
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent);
+    letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-eyebrow::before {
+    content: ''; display: block; width: 24px; height: 1px; background: var(--accent);
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    letter-spacing: -0.03em; line-height: 1.05;
+  }
+
+  /* ABOUT */
+  #about .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  }
+  .about-main {
+    grid-column: 1; padding: 40px;
+  }
+  .about-main p {
+    font-family: 'DM Mono', monospace; font-size: 0.88rem; line-height: 1.85;
+    color: rgba(232,234,240,0.75); margin-bottom: 16px;
+  }
+  .about-aside { display: flex; flex-direction: column; gap: 16px; }
+  .about-card { padding: 28px; }
+  .about-card-label {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .about-card-value {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text);
+  }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .badge {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem; padding: 4px 10px;
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid rgba(79,255,176,0.2); border-radius: 6px;
+    letter-spacing: 0.04em;
+  }
+  .badge.blue {
+    background: var(--accent2-dim); color: var(--accent2);
+    border-color: rgba(0,200,255,0.2);
+  }
+
+  /* EXPERIENCE */
+  #experience .timeline { position: relative; padding-left: 32px; }
+  #experience .timeline::before {
+    content: ''; position: absolute; left: 0; top: 8px; bottom: 0;
+    width: 1px; background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+  .timeline-item { position: relative; margin-bottom: 48px; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -36px; top: 6px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px var(--accent);
+  }
+  .timeline-card { padding: 32px; }
+  .tl-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
+  .tl-role {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem;
+  }
+  .tl-period {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent);
+    background: var(--accent-dim); padding: 4px 10px; border-radius: 6px;
+    border: 1px solid rgba(79,255,176,0.2);
+  }
+  .tl-company {
+    font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .tl-bullets { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .tl-bullets li {
+    font-family: 'DM Mono', monospace; font-size: 0.82rem; line-height: 1.7;
+    color: rgba(232,234,240,0.7); padding-left: 18px; position: relative;
+  }
+  .tl-bullets li::before {
+    content: '▸'; position: absolute; left: 0; color: var(--accent);
+  }
+
+  /* PROJECTS */
+  #projects .projects-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;
+  }
+  .project-card { padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .project-card:hover { transform: translateY(-4px); }
+  .project-num {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  .project-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem;
+    line-height: 1.3;
+  }
+  .project-desc {
+    font-family: 'DM Mono', monospace; font-size: 0.8rem; line-height: 1.75;
+    color: rgba(232,234,240,0.65); flex: 1;
+  }
+  .project-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+  .stack-tag {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 3px 8px;
+    background: rgba(0,200,255,0.08); color: var(--accent2);
+    border: 1px solid rgba(0,200,255,0.15); border-radius: 5px;
+  }
+
+  /* SKILLS */
+  #skills .skills-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+  }
+  .skill-card { padding: 28px; }
+  .skill-category {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--accent2);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .skill-items { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-item {
+    font-family: 'DM Mono', monospace; font-size: 0.76rem; padding: 6px 12px;
+    background: rgba(255,255,255,0.04); color: rgba(232,234,240,0.8);
+    border: 1px solid var(--border); border-radius: 7px;
+    transition: all 0.2s;
+  }
+  .skill-item:hover {
+    border-color: var(--accent); color: var(--accent); background: var(--accent-dim);
+  }
+
+  /* CERTIFICATIONS */
+  .cert-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 40px; }
+  .cert-card { padding: 24px 28px; flex: 1; min-width: 240px; }
+  .cert-icon { font-size: 1.4rem; margin-bottom: 10px; }
+  .cert-name {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;
+  }
+  .cert-issuer {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted);
+  }
+
+  /* BLOG */
+  #blog .blog-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;
+  }
+  .blog-card { padding: 36px; display: flex; flex-direction: column; gap: 14px; }
+  .blog-tag {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--accent);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .blog-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; line-height: 1.35;
+  }
+  .blog-excerpt {
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; line-height: 1.75;
+    color: rgba(232,234,240,0.55); flex: 1;
+  }
+  .blog-meta {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted);
+    padding-top: 14px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .blog-coming {
+    text-align: center; padding: 80px 40px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .blog-coming-emoji { font-size: 3rem; }
+  .blog-coming h3 {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem;
+  }
+  .blog-coming p {
+    font-family: 'DM Mono', monospace; font-size: 0.82rem;
+    color: var(--muted); max-width: 360px; line-height: 1.7;
+  }
+
+  /* CONTACT */
+  #contact .contact-wrap {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; align-items: start;
+  }
+  .contact-info { display: flex; flex-direction: column; gap: 24px; }
+  .contact-intro {
+    font-family: 'DM Mono', monospace; font-size: 0.85rem; line-height: 1.8;
+    color: rgba(232,234,240,0.65);
+  }
+  .contact-link {
+    display: flex; align-items: center; gap: 12px; padding: 18px 22px;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .contact-link:hover { transform: translateX(4px); border-color: var(--accent2); }
+  .contact-link-icon { font-size: 1.1rem; }
+  .contact-link-text { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem; }
+  .contact-link-sub { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .contact-form { display: flex; flex-direction: column; gap: 16px; padding: 40px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group label {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .form-group input, .form-group textarea {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: 0.85rem;
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    outline: none; transition: border-color 0.2s, background 0.2s;
+    resize: none;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: var(--accent); background: rgba(79,255,176,0.04);
+  }
+  .form-group textarea { min-height: 120px; }
+  .form-submit {
+    padding: 14px 32px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #080b0f; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem;
+    border: none; border-radius: var(--radius-sm); cursor: none;
+    transition: all 0.25s; letter-spacing: 0.02em;
+  }
+  .form-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(79,255,176,0.2); }
+  .form-note {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); text-align: center;
+  }
+  .form-success {
+    display: none; text-align: center; padding: 32px;
+    font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); font-size: 1rem;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 2;
+    border-top: 1px solid var(--border);
+    padding: 36px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .footer-copy {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted);
+  }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  /* ANIMATIONS */
+  .fade-in { opacity: 1; transform: translateY(0); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade-in.animate-ready { opacity: 0; transform: translateY(28px); }
+  .fade-in.animate-ready.visible { opacity: 1; transform: translateY(0); }
+  .fade-in-delay-1 { transition-delay: 0.1s; }
+  .fade-in-delay-2 { transition-delay: 0.2s; }
+  .fade-in-delay-3 { transition-delay: 0.3s; }
+
+  /* DIVIDER */
+  .section-divider {
+    max-width: 1200px; margin: 0 auto;
+    height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    #hero { padding: 100px 24px 60px; }
+    .section-wrap { padding: 72px 24px; }
+    #about .about-grid { grid-template-columns: 1fr; }
+    #contact .contact-wrap { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 16px; padding: 28px 24px; }
+  }
+  @media (max-width: 600px) {
+    .hero-stats { gap: 28px; }
+    #projects .projects-grid { grid-template-columns: 1fr; }
+    #skills .skills-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursorDot"><div class="cursor-dot"></div></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Glow orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">SG.</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get in Touch</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div style="max-width:1200px;margin:0 auto;position:relative;">
+    <div class="hero-tag"><span></span> Available for opportunities</div>
+    <h1 class="hero-name fade-in">
+      Sparsh<br><span class="accent-word">Gupta.</span>
+    </h1>
+    <p class="hero-title fade-in fade-in-delay-1">SysAdmin @ D. E. Shaw & Co.</p>
+    <p class="hero-tagline fade-in fade-in-delay-2">
+      Jack of all trades, master of few — keeping infrastructure humming,<br>
+      fleets compliant, and incidents at bay.
+    </p>
+    <div class="hero-actions fade-in fade-in-delay-3">
+      <a href="https://github.com/sparsh985" target="_blank" rel="noopener" class="btn-primary">
+        GitHub ↗
+      </a>
+      <a href="https://linkedin.com/in/ssparsh" target="_blank" rel="noopener" class="btn-ghost">
+        LinkedIn ↗
+      </a>
+    </div>
+    <div class="hero-stats fade-in">
+      <div>
+        <div class="stat-num">31<span style="font-size:1.4rem">mo</span></div>
+        <div class="stat-label">Work Experience</div>
+      </div>
+      <div>
+        <div class="stat-num">2,500+</div>
+        <div class="stat-label">Tickets Resolved</div>
+      </div>
+      <div>
+        <div class="stat-num">3,000+</div>
+        <div class="stat-label">Users Supported</div>
+      </div>
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Global Sites</div>
+      </div>
+    </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <div class="section-eyebrow">Who I Am</div>
+      <h2 class="section-title">A learner. Always.</h2>
+    </div>
+    <div class="about-grid">
+      <div class="glass about-main fade-in">
+        <p>Hi, I'm Sparsh — a Corporate Operations Engineer at D. E. Shaw & Co., where I wear many hats: Windows & Linux SME, fleet manager, infra troubleshooter, and occasional automation builder.</p>
+        <p>I graduated from SICSR, Pune with a BBA in Information Technology (GPA: 9.75 in Sem 6), and jumped straight into enterprise tech ops. I've since resolved 2,500+ tickets, supported 3,000+ users across APAC, NYC and London, and shipped tooling that saved real engineering hours.</p>
+        <p>Outside the terminal, I'm a perpetual learner — experimenting, breaking things in labs, and documenting the journey. This blog is where that starts.</p>
+        <div class="badge-row" style="margin-top:20px;">
+          <span class="badge">SysAdmin</span>
+          <span class="badge">Fleet Management</span>
+          <span class="badge">Windows SME</span>
+          <span class="badge">Linux SME</span>
+          <span class="badge blue">Automation</span>
+          <span class="badge blue">Tech Writing</span>
+        </div>
+      </div>
+      <div class="about-aside">
+        <div class="glass about-card fade-in fade-in-delay-1">
+          <div class="about-card-label">📍 Location</div>
+          <div class="about-card-value">Lucknow → Pune (currently)</div>
+        </div>
+        <div class="glass about-card fade-in fade-in-delay-1">
+          <div class="about-card-label">🎓 Education</div>
+          <div class="about-card-value">BBA – Information Technology</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--muted);margin-top:4px;">SICSR, Symbiosis University, Pune · 2023</div>
+        </div>
+        <div class="glass about-card fade-in fade-in-delay-2">
+          <div class="about-card-label">🏆 Achievements</div>
+          <div class="about-card-value">Merit Scholarship · Sem 6 GPA: 9.75</div>
+        </div>
+        <div class="glass about-card fade-in fade-in-delay-2">
+          <div class="about-card-label">📬 Email</div>
+          <div class="about-card-value"><a href="/cdn-cgi/l/email-protection#0469614477746576776c2a736b766f" style="color:var(--accent);text-decoration:none;"><span class="__cf_email__" data-cfemail="422f270231322330312a6c352d3029">[email&#160;protected]</span></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <div class="section-eyebrow">Where I've Worked</div>
+      <h2 class="section-title">Experience</h2>
+    </div>
+    <div class="timeline">
+
+      <div class="timeline-item fade-in">
+        <div class="glass timeline-card">
+          <div class="tl-header">
+            <div class="tl-role">Member, Tech Operations</div>
+            <div class="tl-period">Jan 2025 – Present</div>
+          </div>
+          <div class="tl-company">D. E. Shaw & Co. — Corporate Operations</div>
+          <ul class="tl-bullets">
+            <li>Act as Subject Matter Expert for Windows and Linux (RHEL) platforms, leading infrastructure improvement projects and process documentation to reduce recurring incidents.</li>
+            <li>Oversee new product introductions across hardware and software, managing OS upgrade initiatives for Windows workstations and coordinating cross-functional rollout with engineering teams.</li>
+            <li>Lead proactive fleet management — monitoring hardware health, pre-empting failures before user impact, and improving incident and problem management capabilities to reduce downtime.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="glass timeline-card">
+          <div class="tl-header">
+            <div class="tl-role">Associate, Tech Operations</div>
+            <div class="tl-period">Jul 2023 – Dec 2024</div>
+          </div>
+          <div class="tl-company">D. E. Shaw & Co. — Corporate Operations</div>
+          <ul class="tl-bullets">
+            <li>Primary technical support liaison for 3,000+ users across APAC, NYC and London; resolved ~2,500 tickets spanning Windows, Linux and networking.</li>
+            <li>Administered MDM fleet management using Microsoft Intune and VMware Workspace ONE — endpoint lifecycle, SCCM-based deployments, OS compliance across the fleet.</li>
+            <li>Project-managed delivery of an LLM-based automatic ticket triager in collaboration with engineering, saving ~1 hour/day per engineer and significantly reducing ticket backlog.</li>
+            <li>Supported passwordless/identity initiatives including 2FA and Windows Hello; worked with RHEL infra alongside NetApp and GPFS storage environments.</li>
+            <li>Authored internal runbooks, onboarding documentation and support guides to enable consistent, scalable operations.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <div class="section-eyebrow">Selected Work</div>
+      <h2 class="section-title">Projects</h2>
+    </div>
+    <div class="projects-grid">
+
+      <div class="glass project-card fade-in">
+        <div class="project-num">01 —</div>
+        <div class="project-title">Medicine Reminder Bot</div>
+        <div class="project-desc">A persistent reminder bot for WhatsApp & Telegram that keeps sending reminders at increasing intervals until the user confirms they've taken their medication. Built with Node.js, fully Dockerized, supports exponential backoff, acknowledgment keywords, call escalation on Telegram, and state persistence across restarts. Zero user setup required.</div>
+        <div class="project-stack">
+          <span class="stack-tag">Node.js</span>
+          <span class="stack-tag">Telegram Bot API</span>
+          <span class="stack-tag">WhatsApp Meta API</span>
+          <span class="stack-tag">Docker</span>
+          <span class="stack-tag">Shell</span>
+        </div>
+        <a href="https://github.com/sparsh985/medicine-reminder-bot" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--accent2);text-decoration:none;margin-top:4px;display:inline-flex;align-items:center;gap:6px;">View on GitHub ↗</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <div class="section-eyebrow">Technical Toolkit</div>
+      <h2 class="section-title">Skills & Stack</h2>
+    </div>
+    <div class="skills-grid">
+
+      <div class="glass skill-card fade-in">
+        <div class="skill-category">OS Platforms</div>
+        <div class="skill-items">
+          <span class="skill-item">Windows Server</span>
+          <span class="skill-item">Windows Workstation</span>
+          <span class="skill-item">Linux RHEL</span>
+          <span class="skill-item">Unix</span>
+        </div>
+      </div>
+
+      <div class="glass skill-card fade-in fade-in-delay-1">
+        <div class="skill-category">Fleet & Endpoint</div>
+        <div class="skill-items">
+          <span class="skill-item">Microsoft Intune</span>
+          <span class="skill-item">VMware Workspace ONE</span>
+          <span class="skill-item">SCCM</span>
+          <span class="skill-item">Active Directory</span>
+          <span class="skill-item">Citrix</span>
+        </div>
+      </div>
+
+      <div class="glass skill-card fade-in fade-in-delay-2">
+        <div class="skill-category">Networking</div>
+        <div class="skill-items">
+          <span class="skill-item">WAN VPN</span>
+          <span class="skill-item">Cisco Routers</span>
+          <span class="skill-item">Network Diagnostics</span>
+          <span class="skill-item">Enterprise Networking</span>
+        </div>
+      </div>
+
+      <div class="glass skill-card fade-in">
+        <div class="skill-category">Security & Identity</div>
+        <div class="skill-items">
+          <span class="skill-item">RSA</span>
+          <span class="skill-item">HYPR</span>
+          <span class="skill-item">2FA</span>
+          <span class="skill-item">Windows Hello</span>
+          <span class="skill-item">Root/Sudo Audit</span>
+          <span class="skill-item">Vuln Patching</span>
+        </div>
+      </div>
+
+      <div class="glass skill-card fade-in fade-in-delay-1">
+        <div class="skill-category">Automation & Scripting</div>
+        <div class="skill-items">
+          <span class="skill-item">PowerShell</span>
+          <span class="skill-item">Bash/Shell</span>
+          <span class="skill-item">Git</span>
+          <span class="skill-item">LLM Tooling</span>
+          <span class="skill-item">Grafana</span>
+        </div>
+      </div>
+
+      <div class="glass skill-card fade-in fade-in-delay-2">
+        <div class="skill-category">Infra & Storage</div>
+        <div class="skill-items">
+          <span class="skill-item">NetApp</span>
+          <span class="skill-item">GPFS</span>
+          <span class="skill-item">Windows Server</span>
+          <span class="skill-item">RHEL Infra</span>
+        </div>
+      </div>
+
+      <div class="glass skill-card fade-in">
+        <div class="skill-category">Tools & Comms</div>
+        <div class="skill-items">
+          <span class="skill-item">Confluence</span>
+          <span class="skill-item">Incident Mgmt</span>
+          <span class="skill-item">Runbook Authoring</span>
+          <span class="skill-item">Cisco WebEx</span>
+          <span class="skill-item">Zoom</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Certs -->
+    <div style="margin-top:56px;" class="fade-in">
+      <div class="section-eyebrow" style="margin-bottom:24px;">Certifications</div>
+      <div class="cert-row">
+        <div class="glass cert-card">
+          <div class="cert-icon">🪟</div>
+          <div class="cert-name">Career Essentials in System Administration</div>
+          <div class="cert-issuer">Microsoft · Technology · 2024</div>
+        </div>
+        <div class="glass cert-card">
+          <div class="cert-icon">📈</div>
+          <div class="cert-name">NISM Series 8</div>
+          <div class="cert-issuer">NISM · Equity Derivatives · Financial</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- BLOG -->
+<section id="blog">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <div class="section-eyebrow">Thoughts & Writing</div>
+      <h2 class="section-title">Blog</h2>
+    </div>
+    <div class="glass blog-coming fade-in">
+      <div class="blog-coming-emoji">✍️</div>
+      <h3>Something's brewing.</h3>
+      <p>I'm starting to write about infrastructure, ops learnings, tools I build, and things I learn the hard way. First post coming soon.</p>
+      <a href="/cdn-cgi/l/email-protection#adc0c8eddeddccdfdec583dac2dfc692ded8cfc7c8ced990e3c2d9c4cbd48dc0c88ddac5c8c38dd4c2d88dddc2ded9" class="btn-ghost" style="margin-top:8px;font-size:0.82rem;">Notify me when you post →</a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-wrap">
+    <div class="section-header fade-in">
+      <div class="section-eyebrow">Let's Connect</div>
+      <h2 class="section-title">Get in Touch</h2>
+    </div>
+    <div class="contact-wrap">
+      <div class="contact-info fade-in">
+        <p class="contact-intro">Whether it's about a role, a collaboration, or you just want to talk infra, automation, or ops — I'm around. Slide into the inbox.</p>
+        <a href="https://linkedin.com/in/ssparsh" target="_blank" rel="noopener" class="glass contact-link">
+          <span class="contact-link-icon">🔗</span>
+          <div>
+            <div class="contact-link-text">LinkedIn</div>
+            <div class="contact-link-sub">linkedin.com/in/ssparsh</div>
+          </div>
+        </a>
+        <a href="/cdn-cgi/l/email-protection#fa979fba898a9b888992d48d958891" class="glass contact-link">
+          <span class="contact-link-icon">📬</span>
+          <div>
+            <div class="contact-link-text">Email</div>
+            <div class="contact-link-sub"><span class="__cf_email__" data-cfemail="81ece4c1f2f1e0f3f2e9aff6eef3ea">[email&#160;protected]</span></div>
+          </div>
+        </a>
+        <a href="https://github.com/sparsh985" target="_blank" rel="noopener" class="glass contact-link">
+          <span class="contact-link-icon">🐙</span>
+          <div>
+            <div class="contact-link-text">GitHub</div>
+            <div class="contact-link-sub">github.com/sparsh985</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="glass contact-form fade-in fade-in-delay-1" id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="fname" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="femail" placeholder="you@email.com" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <input type="text" id="fsubject" placeholder="What's this about?" />
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="fmessage" placeholder="Tell me more..."></textarea>
+        </div>
+        <button class="form-submit" onclick="handleSubmit()">Send Message →</button>
+        <p class="form-note">Sends directly to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="09646c497a79687b7a61277e667b62">[email&#160;protected]</a></p>
+        <div class="form-success" id="formSuccess">✅ Message sent! I'll get back to you soon.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2025 Sparsh Gupta. Built with care, no frameworks needed.</div>
+  <div class="footer-links">
+    <a href="https://linkedin.com/in/ssparsh" target="_blank">LinkedIn</a>
+    <a href="https://github.com/sparsh985" target="_blank">GitHub</a>
+    <a href="/cdn-cgi/l/email-protection#9bf6fedbe8ebfae9e8f3b5ecf4e9f0">Email</a>
+    <a href="#hero">↑ Top</a>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Cursor
+const dot = document.getElementById('cursorDot').querySelector('.cursor-dot');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0, cursorStarted = false;
+
+dot.style.opacity = '0';
+ring.style.opacity = '0';
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX;
+  my = e.clientY;
+  if (!cursorStarted) {
+    cursorStarted = true;
+    document.body.classList.add('cursor-active');
+    dot.style.opacity = '1';
+    ring.style.opacity = '1';
+    // Snap ring to position on first move to avoid lag from 0,0
+    rx = mx; ry = my;
+  }
+});
+
+function animateCursor() {
+  dot.style.position = 'fixed';
+  dot.style.left = mx + 'px';
+  dot.style.top = my + 'px';
+  rx += (mx - rx) * 0.14;
+  ry += (my - ry) * 0.14;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+document.querySelectorAll('a, button, .glass').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
+});
+
+// Intersection Observer for fade-in
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-in').forEach(el => {
+  el.classList.add('animate-ready');
+  observer.observe(el);
+});
+
+// Contact form
+function handleSubmit() {
+  const name = document.getElementById('fname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  const subject = document.getElementById('fsubject').value.trim();
+  const message = document.getElementById('fmessage').value.trim();
+  if (!name || !email || !message) { alert('Please fill in at least name, email and message.'); r
