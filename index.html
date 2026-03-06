@@ -39,25 +39,29 @@
   body.cursor-active a, body.cursor-active button, body.cursor-active .glass { cursor: none; }
 
   /* CUSTOM CURSOR */
-  .cursor {
-    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
-    mix-blend-mode: difference;
-  }
   .cursor-dot {
-    width: 8px; height: 8px; background: #fff; border-radius: 50%;
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
     transform: translate(-50%, -50%);
-    transition: transform 0.1s;
+    transition: width 0.2s, height 0.2s, background 0.2s;
+    will-change: left, top;
   }
   .cursor-ring {
-    position: fixed; top: 0; left: 0;
+    position: fixed;
     width: 36px; height: 36px;
-    border: 1.5px solid rgba(255,255,255,0.5);
+    border: 1.5px solid rgba(255,255,255,0.4);
     border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
     transform: translate(-50%, -50%);
-    pointer-events: none; z-index: 9998;
-    transition: transform 0.18s ease, width 0.2s, height 0.2s, opacity 0.2s;
+    transition: width 0.2s, height 0.2s, border-color 0.2s, opacity 0.2s;
+    will-change: left, top;
   }
-  .cursor-ring.hovered { width: 56px; height: 56px; opacity: 0.6; }
+  .cursor-ring.hovered { width: 52px; height: 52px; border-color: var(--accent); opacity: 0.7; }
 
   /* NOISE OVERLAY */
   body::before {
@@ -489,7 +493,7 @@
 <body>
 
 <!-- Custom Cursor -->
-<div class="cursor" id="cursorDot"><div class="cursor-dot"></div></div>
+<div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 
 <!-- Glow orbs -->
@@ -577,7 +581,7 @@
       <div class="about-aside">
         <div class="glass about-card fade-in fade-in-delay-1">
           <div class="about-card-label">📍 Location</div>
-          <div class="about-card-value">Lucknow → Pune (currently)</div>
+          <div class="about-card-value">Lucknow → Hyderabad (currently)</div>
         </div>
         <div class="glass about-card fade-in fade-in-delay-1">
           <div class="about-card-label">🎓 Education</div>
@@ -873,7 +877,7 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Cursor
-const dot = document.getElementById('cursorDot').querySelector('.cursor-dot');
+const dot = document.getElementById('cursorDot');
 const ring = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0, cursorStarted = false;
 
@@ -888,22 +892,25 @@ document.addEventListener('mousemove', e => {
     document.body.classList.add('cursor-active');
     dot.style.opacity = '1';
     ring.style.opacity = '1';
-    // Snap ring to position on first move to avoid lag from 0,0
     rx = mx; ry = my;
   }
 });
 
 function animateCursor() {
-  dot.style.position = 'fixed';
   dot.style.left = mx + 'px';
   dot.style.top = my + 'px';
-  rx += (mx - rx) * 0.14;
-  ry += (my - ry) * 0.14;
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
   ring.style.left = rx + 'px';
   ring.style.top = ry + 'px';
   requestAnimationFrame(animateCursor);
 }
 animateCursor();
+
+document.querySelectorAll('a, button, .glass').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
+});
 document.querySelectorAll('a, button, .glass').forEach(el => {
   el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
   el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
